@@ -40,13 +40,28 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite, otherSprite) {
     sprite.sayText("Talar arbre", 100, false)
     if (controller.A.isPressed()) {
+        otherSprite.startEffect(effects.ashes, 200)
         otherSprite.setFlag(SpriteFlag.Invisible, true)
         otherSprite.setFlag(SpriteFlag.Ghost, true)
-        otherSprite.setPosition(randint(110, 145), randint(90, 100))
+        if (otherSprite == tree) {
+            otherSprite.setPosition(randint(100, 110), randint(90, 100))
+        } else if (otherSprite == tree2) {
+            otherSprite.setPosition(randint(115, 125), randint(110, 120))
+        } else {
+            otherSprite.setPosition(randint(130, 145), randint(100, 110))
+        }
+        logs += 1
+        info.setScore(logs)
+        timer.after(3000, function () {
+            otherSprite.setFlag(SpriteFlag.Invisible, false)
+            otherSprite.setFlag(SpriteFlag.Ghost, false)
+        })
     }
 })
-let list: Sprite[] = []
+let logs = 0
 let nena: Sprite = null
+let tree2: Sprite = null
+let tree: Sprite = null
 scene.setBackgroundImage(img`
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     7777777777777777777777777777777777777777777777777777777777777777777777777377777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -219,7 +234,7 @@ let house = sprites.create(img`
     .....64eee444c66f4e44e44e44e44ee66c444eee46.....
     ......6ccc666c66e4e44e44e44e44ee66c666ccc6......
     `, SpriteKind.House)
-let tree = sprites.create(img`
+tree = sprites.create(img`
     ...............cc...............
     ............ccc65c66............
     ............c6c55c76............
@@ -296,7 +311,7 @@ let tree3 = sprites.create(img`
     ...............fceeec...............
     ...............ffceec...............
     `, SpriteKind.Tree)
-let tree2 = sprites.create(img`
+tree2 = sprites.create(img`
     ......cc66......
     .....c6576c.....
     ....c677576c....
@@ -323,9 +338,7 @@ let tree2 = sprites.create(img`
     .......ee.......
     `, SpriteKind.Tree)
 nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
-list.push(tree)
-list.push(tree)
-list.push(tree)
+info.setScore(logs)
 controller.moveSprite(nena)
 nena.setStayInScreen(true)
 nena.setPosition(80, 95)
