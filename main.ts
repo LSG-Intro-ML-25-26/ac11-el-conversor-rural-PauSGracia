@@ -39,6 +39,11 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite, otherSprite) {
     sprite.sayText("Talar arbre", 100, false)
+    if (controller.A.isPressed()) {
+        otherSprite.setFlag(SpriteFlag.Invisible, true)
+        otherSprite.setFlag(SpriteFlag.Ghost, true)
+        otherSprite.setPosition(randint(110, 145), randint(90, 100))
+    }
 })
 let list: Sprite[] = []
 let nena: Sprite = null
@@ -328,3 +333,5 @@ house.setPosition(17, 90)
 tree.setPosition(109, 90)
 tree2.setPosition(125, 99)
 tree3.setPosition(144, 90)
+tree.setScale(0.8, ScaleAnchor.Middle)
+tree3.setScale(0.8, ScaleAnchor.Middle)
