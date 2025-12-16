@@ -12,6 +12,70 @@ def on_up_pressed():
         False)
 controller.up.on_event(ControllerButtonEvent.PRESSED, on_up_pressed)
 
+def on_a_pressed():
+    global trade_menu_open, selection_menu
+    if nena.overlaps_with(house) and trade_menu_open == 0:
+        trade_menu_open = 1
+        selection_menu = miniMenu.create_menu(miniMenu.create_menu_item("Gallina"),
+            miniMenu.create_menu_item("Patata"),
+            miniMenu.create_menu_item("Cabra"),
+            miniMenu.create_menu_item("Ous"),
+            miniMenu.create_menu_item("Caball"),
+            miniMenu.create_menu_item("Tancar menú"))
+        selection_menu.set_title("Selecciona producte")
+        
+        def on_selection_changed(selection, selectedIndex):
+            global current_item, current_price
+            if selectedIndex == 0:
+                current_item = selection
+                current_price = 6
+            elif selectedIndex == 1:
+                current_item = selection
+                current_price = 2
+            elif selectedIndex == 2:
+                current_item = selection
+                current_price = 5
+            elif selectedIndex == 3:
+                current_item = selection
+                current_price = 3
+            elif selectedIndex == 4:
+                current_item = selection
+                current_price = 12
+            else:
+                current_item = selection
+                current_price = 0
+        selection_menu.on_selection_changed(on_selection_changed)
+        
+        
+        def on_button_pressed(selection2, selectedIndex2):
+            global trade_menu_open, trade_menu
+            selection_menu.close()
+            trade_menu_open = 0
+            if selectedIndex2 != 5:
+                trade_menu = miniMenu.create_menu(miniMenu.create_menu_item("Comprar"),
+                    miniMenu.create_menu_item("Vendre"),
+                    miniMenu.create_menu_item("Tornar Enrere"))
+                trade_menu.set_title(selection2)
+                
+                def on_button_pressed2(selection3, selectedIndex3):
+                    global logs
+                    if selectedIndex3 == 0:
+                        if logs >= current_price:
+                            logs = logs - current_price
+                            if current_item == "Gallina":
+                                pass
+                        else:
+                            game.splash("No tens suficient fusta")
+                        game.splash("Gallina Comprada")
+                    elif selectedIndex3 == 1:
+                        pass
+                    trade_menu.close()
+                trade_menu.on_button_pressed(controller.A, on_button_pressed2)
+                
+        selection_menu.on_button_pressed(controller.A, on_button_pressed)
+        
+controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
+
 def on_left_pressed():
     animation.run_image_animation(nena,
         assets.animation("""
@@ -43,8 +107,39 @@ def on_down_pressed():
         False)
 controller.down.on_event(ControllerButtonEvent.PRESSED, on_down_pressed)
 
-list2: List[Sprite] = []
+def on_on_overlap2(sprite2, otherSprite2):
+    global logs
+    sprite2.say_text("Talar arbre", 100, False)
+    if controller.A.is_pressed():
+        otherSprite2.start_effect(effects.ashes, 200)
+        otherSprite2.set_flag(SpriteFlag.INVISIBLE, True)
+        otherSprite2.set_flag(SpriteFlag.GHOST, True)
+        if otherSprite2 == tree:
+            otherSprite2.set_position(randint(100, 110), randint(90, 100))
+        elif otherSprite2 == tree2:
+            otherSprite2.set_position(randint(115, 125), randint(110, 120))
+        else:
+            otherSprite2.set_position(randint(130, 145), randint(100, 110))
+        logs += 1
+        info.set_score(logs)
+        
+        def on_after():
+            otherSprite2.set_flag(SpriteFlag.INVISIBLE, False)
+            otherSprite2.set_flag(SpriteFlag.GHOST, False)
+        timer.after(3000, on_after)
+        
+sprites.on_overlap(SpriteKind.player, SpriteKind.Tree, on_on_overlap2)
+
+trade_menu: miniMenu.MenuSprite = None
+current_price = 0
+current_item = ""
+selection_menu: miniMenu.MenuSprite = None
+logs = 0
+trade_menu_open = 0
 nena: Sprite = None
+tree2: Sprite = None
+tree: Sprite = None
+house: Sprite = None
 scene.set_background_image(img("""
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     7777777777777777777777777777777777777777777777777777777777777777777777777377777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -253,33 +348,6 @@ tree = sprites.create(img("""
         ...............f................
         """),
     SpriteKind.Tree)
-tree2 = sprites.create(img("""
-        ......cc66......
-        .....c6576c.....
-        ....c677576c....
-        ....cc677666....
-        ...cc6c6667cc...
-        ..6c666777cc6c..
-        ..c76666766776..
-        ..c6777777776c..
-        ..cc67777776cc..
-        .c67cc76676676c.
-        .c777666667777c.
-        .c6777777777766.
-        .cc7767776776666
-        c676cc6766666776
-        c777766666677776
-        cc7777777777776c
-        .c676777677767c.
-        ..cc667666766c..
-        ...ccc6c66ccc...
-        .....cccccc.....
-        .......ee.......
-        ......eeee......
-        .....eeeeee.....
-        .......ee.......
-        """),
-    SpriteKind.Tree)
 tree3 = sprites.create(img("""
         ................86..................
         ...........6688867886...............
@@ -324,12 +392,38 @@ tree3 = sprites.create(img("""
         ...............ffceec...............
         """),
     SpriteKind.Tree)
+tree2 = sprites.create(img("""
+        ......cc66......
+        .....c6576c.....
+        ....c677576c....
+        ....cc677666....
+        ...cc6c6667cc...
+        ..6c666777cc6c..
+        ..c76666766776..
+        ..c6777777776c..
+        ..cc67777776cc..
+        .c67cc76676676c.
+        .c777666667777c.
+        .c6777777777766.
+        .cc7767776776666
+        c676cc6766666776
+        c777766666677776
+        cc7777777777776c
+        .c676777677767c.
+        ..cc667666766c..
+        ...ccc6c66ccc...
+        .....cccccc.....
+        .......ee.......
+        ......eeee......
+        .....eeeeee.....
+        .......ee.......
+        """),
+    SpriteKind.Tree)
 nena = sprites.create(assets.image("""
     nena-front
     """), SpriteKind.player)
-list2.append(tree)
-list2.append(tree)
-list2.append(tree)
+trade_menu_open = 0
+info.set_score(logs)
 controller.move_sprite(nena)
 nena.set_stay_in_screen(True)
 nena.set_position(80, 95)
@@ -337,3 +431,5 @@ house.set_position(17, 90)
 tree.set_position(109, 90)
 tree2.set_position(125, 99)
 tree3.set_position(144, 90)
+tree.set_scale(0.8, ScaleAnchor.MIDDLE)
+tree3.set_scale(0.8, ScaleAnchor.MIDDLE)

@@ -10,17 +10,8 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
-controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    nena,
-    assets.animation`nena-animation-left`,
-    200,
-    false
-    )
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function (sprite, otherSprite) {
-    sprite.sayText("Vendre fusta", 100, false)
-    if (controller.A.isPressed() && trade_menu_open == 0) {
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (nena.overlapsWith(house) && trade_menu_open == 0) {
         trade_menu_open = 1
         selection_menu = miniMenu.createMenu(
         miniMenu.createMenuItem("Gallina"),
@@ -49,42 +40,83 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function (sprite, otherSp
                 current_price = 12
             } else {
                 current_item = selection
-                current_price = 12
+                current_price = 0
             }
         })
-        selection_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
-            if (selectedIndex != 5) {
+        selection_menu.onButtonPressed(controller.A, function (selection2, selectedIndex2) {
+            selection_menu.close()
+            trade_menu_open = 0
+            if (selectedIndex2 != 5) {
                 trade_menu = miniMenu.createMenu(
                 miniMenu.createMenuItem("Comprar"),
                 miniMenu.createMenuItem("Vendre"),
                 miniMenu.createMenuItem("Tornar Enrere")
                 )
-                trade_menu.setTitle(selection)
-                trade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
-                    if (selectedIndex == 0) {
+                trade_menu.setTitle(selection2)
+                trade_menu.onButtonPressed(controller.A, function (selection3, selectedIndex3) {
+                    if (selectedIndex3 == 0) {
                         if (logs >= current_price) {
-                            chickens = chickens + 1
-                            logs = logs - 6
-                            game.splash("Gallina Comprada")
+                            logs = logs - current_price
+                            info.setScore(logs)
+                            if (current_item == "Gallina") {
+                                chicken = chicken + 1
+                                game.splash("Gallina Comprada")
+                            } else if (current_item == "Patata") {
+                                potato = potato + 1
+                                game.splash("Patates Comprades")
+                            } else if (current_item == "Cabra") {
+                                goat = goat + 1
+                                game.splash("Cabra comprada")
+                            } else if (current_item == "Ous") {
+                                egg = egg + 12
+                                game.splash("Ous comprats")
+                            } else if (current_item == "Caball") {
+                                egg = egg + 12
+                                game.splash("Caball comprat")
+                            }
                         } else {
                             game.splash("No tens suficient fusta")
                         }
-                    } else if (selectedIndex == 1) {
-                        if (chickens >= 1) {
-                            chickens = chickens - 1
-                            logs = logs + 6
-                            game.splash("Gallina venguda")
+                    } else if (selectedIndex3 == 1) {
+                        if (logs >= current_price) {
+                            logs = logs + current_price
+                            info.setScore(logs)
+                            if (current_item == "Gallina") {
+                                chicken = chicken - 1
+                                game.splash("Gallina Comprada")
+                            } else if (current_item == "Patata") {
+                                potato = potato + 1
+                                game.splash("Patates Comprades")
+                            } else if (current_item == "Cabra") {
+                                goat = goat + 1
+                                game.splash("Cabra comprada")
+                            } else if (current_item == "Ous") {
+                                egg = egg + 12
+                                game.splash("Ous comprats")
+                            } else if (current_item == "Caball") {
+                                egg = egg + 12
+                                game.splash("Caball comprat")
+                            }
                         } else {
-                            game.splash("No tens suficient gallines")
+                            game.splash("No tens suficient ", current_item)
                         }
                     }
                     trade_menu.close()
                 })
             }
-            selection_menu.close()
         })
     }
-    trade_menu_open = 0
+})
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    animation.runImageAnimation(
+    nena,
+    assets.animation`nena-animation-left`,
+    200,
+    false
+    )
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function (sprite, otherSprite) {
+    sprite.sayText("Vendre fusta", 100, false)
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
@@ -102,28 +134,31 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite, otherSprite) {
-    sprite.sayText("Talar arbre", 100, false)
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite2, otherSprite2) {
+    sprite2.sayText("Talar arbre", 100, false)
     if (controller.A.isPressed()) {
-        otherSprite.startEffect(effects.ashes, 200)
-        otherSprite.setFlag(SpriteFlag.Invisible, true)
-        otherSprite.setFlag(SpriteFlag.Ghost, true)
-        if (otherSprite == tree) {
-            otherSprite.setPosition(randint(100, 110), randint(90, 100))
-        } else if (otherSprite == tree2) {
-            otherSprite.setPosition(randint(115, 125), randint(110, 120))
+        otherSprite2.startEffect(effects.ashes, 200)
+        otherSprite2.setFlag(SpriteFlag.Invisible, true)
+        otherSprite2.setFlag(SpriteFlag.Ghost, true)
+        if (otherSprite2 == tree) {
+            otherSprite2.setPosition(randint(100, 110), randint(90, 100))
+        } else if (otherSprite2 == tree2) {
+            otherSprite2.setPosition(randint(115, 125), randint(110, 120))
         } else {
-            otherSprite.setPosition(randint(130, 145), randint(100, 110))
+            otherSprite2.setPosition(randint(130, 145), randint(100, 110))
         }
         logs += 1
         info.setScore(logs)
         timer.after(3000, function () {
-            otherSprite.setFlag(SpriteFlag.Invisible, false)
-            otherSprite.setFlag(SpriteFlag.Ghost, false)
+            otherSprite2.setFlag(SpriteFlag.Invisible, false)
+            otherSprite2.setFlag(SpriteFlag.Ghost, false)
         })
     }
 })
-let chickens = 0
+let egg = 0
+let goat = 0
+let potato = 0
+let chicken = 0
 let trade_menu: miniMenu.MenuSprite = null
 let current_price = 0
 let current_item = ""
@@ -133,6 +168,7 @@ let trade_menu_open = 0
 let nena: Sprite = null
 let tree2: Sprite = null
 let tree: Sprite = null
+let house: Sprite = null
 scene.setBackgroundImage(img`
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     7777777777777777777777777777777777777777777777777777777777777777777777777377777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -255,7 +291,7 @@ scene.setBackgroundImage(img`
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     `)
-let house = sprites.create(img`
+house = sprites.create(img`
     ....................e2e22e2e....................
     .................222eee22e2e222.................
     ..............222e22e2e22eee22e222..............
