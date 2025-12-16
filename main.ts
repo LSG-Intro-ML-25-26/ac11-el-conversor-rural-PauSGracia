@@ -20,6 +20,71 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function (sprite, otherSprite) {
     sprite.sayText("Vendre fusta", 100, false)
+    if (controller.A.isPressed() && trade_menu_open == 0) {
+        trade_menu_open = 1
+        selection_menu = miniMenu.createMenu(
+        miniMenu.createMenuItem("Gallina"),
+        miniMenu.createMenuItem("Patata"),
+        miniMenu.createMenuItem("Cabra"),
+        miniMenu.createMenuItem("Ous"),
+        miniMenu.createMenuItem("Caball"),
+        miniMenu.createMenuItem("Tancar menú")
+        )
+        selection_menu.setTitle("Selecciona producte")
+        selection_menu.onSelectionChanged(function (selection, selectedIndex) {
+            if (selectedIndex == 0) {
+                current_item = selection
+                current_price = 6
+            } else if (selectedIndex == 1) {
+                current_item = selection
+                current_price = 2
+            } else if (selectedIndex == 2) {
+                current_item = selection
+                current_price = 5
+            } else if (selectedIndex == 3) {
+                current_item = selection
+                current_price = 3
+            } else if (selectedIndex == 4) {
+                current_item = selection
+                current_price = 12
+            } else {
+                current_item = selection
+                current_price = 12
+            }
+        })
+        selection_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+            if (selectedIndex != 5) {
+                trade_menu = miniMenu.createMenu(
+                miniMenu.createMenuItem("Comprar"),
+                miniMenu.createMenuItem("Vendre"),
+                miniMenu.createMenuItem("Tornar Enrere")
+                )
+                trade_menu.setTitle(selection)
+                trade_menu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    if (selectedIndex == 0) {
+                        if (logs >= current_price) {
+                            chickens = chickens + 1
+                            logs = logs - 6
+                            game.splash("Gallina Comprada")
+                        } else {
+                            game.splash("No tens suficient fusta")
+                        }
+                    } else if (selectedIndex == 1) {
+                        if (chickens >= 1) {
+                            chickens = chickens - 1
+                            logs = logs + 6
+                            game.splash("Gallina venguda")
+                        } else {
+                            game.splash("No tens suficient gallines")
+                        }
+                    }
+                    trade_menu.close()
+                })
+            }
+            selection_menu.close()
+        })
+    }
+    trade_menu_open = 0
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
@@ -58,7 +123,13 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite, otherSpr
         })
     }
 })
+let chickens = 0
+let trade_menu: miniMenu.MenuSprite = null
+let current_price = 0
+let current_item = ""
+let selection_menu: miniMenu.MenuSprite = null
 let logs = 0
+let trade_menu_open = 0
 let nena: Sprite = null
 let tree2: Sprite = null
 let tree: Sprite = null
@@ -338,6 +409,7 @@ tree2 = sprites.create(img`
     .......ee.......
     `, SpriteKind.Tree)
 nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
+trade_menu_open = 0
 info.setScore(logs)
 controller.moveSprite(nena)
 nena.setStayInScreen(true)
