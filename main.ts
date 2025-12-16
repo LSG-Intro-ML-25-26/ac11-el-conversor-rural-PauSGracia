@@ -96,6 +96,8 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
     
     if (nena.overlapsWith(house) && trade_menu_open == 0) {
         trade_menu_open = 1
+        //  stop player movement
+        controller.moveSprite(nena, 0, 0)
         selection_menu = miniMenu.createMenu(miniMenu.createMenuItem("Gallina"), miniMenu.createMenuItem("Patata"), miniMenu.createMenuItem("Cabra"), miniMenu.createMenuItem("Ous"), miniMenu.createMenuItem("Caball"), miniMenu.createMenuItem("Tancar menú"))
         selection_menu.setTitle("Selecciona producte")
         selection_menu.onButtonPressed(controller.A, function on_button_pressed(selection: any, selectedIndex: number) {
@@ -112,6 +114,8 @@ function on_item_selected(selection: any, selectedIndex: number) {
     //  close menu
     if (selectedIndex == 5) {
         trade_menu_open = 0
+        //  restore player movement
+        controller.moveSprite(nena, 100, 100)
         return
     }
     
@@ -161,6 +165,8 @@ function on_trade_action(selection: any, index: any) {
     //  Close
     trade_menu.close()
     trade_menu_open = 0
+    //  restore player movement
+    controller.moveSprite(nena, 100, 100)
 }
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function on_on_overlap(sprite: Sprite, otherSprite: Sprite) {

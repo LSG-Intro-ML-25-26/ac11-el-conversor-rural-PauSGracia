@@ -70,7 +70,9 @@ def on_a_pressed():
     
     if nena.overlaps_with(house) and trade_menu_open == 0:
         trade_menu_open = 1
-        
+        # stop player movement
+        controller.move_sprite(nena, 0, 0)
+
         selection_menu = miniMenu.create_menu(
             miniMenu.create_menu_item("Gallina"),
             miniMenu.create_menu_item("Patata"),
@@ -96,6 +98,8 @@ def on_item_selected(selection, selectedIndex):
     # close menu
     if selectedIndex == 5:
         trade_menu_open = 0
+        # restore player movement
+        controller.move_sprite(nena, 100, 100)
         return
 
     current_item = shop_items[selectedIndex]
@@ -151,6 +155,9 @@ def on_trade_action(selection, index):
     # Close
     trade_menu.close()
     trade_menu_open = 0
+    # restore player movement
+    controller.move_sprite(nena, 100, 100)
+
 
 def on_on_overlap(sprite, otherSprite):
     sprite.say_text("A per Vendre", 100, False)
