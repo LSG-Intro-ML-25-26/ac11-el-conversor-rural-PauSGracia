@@ -147,20 +147,19 @@ def on_trade_action(selection, index):
     elif index == 2: 
         pass
 
-    info.set_score(logs)
-    
+    update_items_display()
     # Close
     trade_menu.close()
     trade_menu_open = 0
 
 def on_on_overlap(sprite, otherSprite):
-    sprite.say_text("Vendre fusta", 100, False)
+    sprite.say_text("A per Vendre", 100, False)
 sprites.on_overlap(SpriteKind.player, SpriteKind.House, on_on_overlap)
 
 # -- CUT TREES --
 def on_on_overlap2(sprite2, otherSprite2):
     global logs
-    sprite2.say_text("Talar arbre", 100, False)
+    sprite2.say_text("A per Talar", 100, False)
     if controller.A.is_pressed():
         otherSprite2.start_effect(effects.ashes, 200)
         otherSprite2.set_flag(SpriteFlag.INVISIBLE, True)
@@ -172,14 +171,55 @@ def on_on_overlap2(sprite2, otherSprite2):
         else:
             otherSprite2.set_position(randint(130, 145), randint(100, 110))
         logs += 1
-        info.set_score(logs)
-        
+        update_items_display()
+
         def on_after():
             otherSprite2.set_flag(SpriteFlag.INVISIBLE, False)
             otherSprite2.set_flag(SpriteFlag.GHOST, False)
         timer.after(3000, on_after)
         
 sprites.on_overlap(SpriteKind.player, SpriteKind.Tree, on_on_overlap2)
+
+# -- TEXTS --
+def setup_items_display():
+    global logs_text, items_texts
+        
+    bg_color = 15
+    fg_color = 1
+    border_color = 1
+    y_pos = 1
+    
+    logs_text = textsprite.create("Fusta: " + str(logs), bg_color, fg_color)
+    logs_text.set_border(1, border_color)
+    logs_text.set_max_font_height(8)
+    logs_text.left = 1
+    logs_text.top = y_pos
+    
+    for item in shop_items:
+        y_pos += 10
+        quantity = item.get_quantity()
+        name = item.get_name()
+        text = textsprite.create(name + ": " + str(quantity), bg_color, fg_color)
+        
+
+        text.set_border(1, border_color)
+        text.set_max_font_height(8)
+        text.left = 1
+        text.top = y_pos
+        items_texts.append(text)
+
+def update_items_display():
+    logs_text.set_text("Fusta: " + str(logs))
+    logs_text.left = 1
+    for i in range(len(shop_items)):
+        current_item = shop_items[i]
+        current_text = items_texts[i]
+        
+        quantity = current_item.get_quantity()
+        name = current_item.get_name()
+        
+        current_text.set_text(name + ": " + str(quantity))
+        current_text.left = 1
 
 # -- START --
 shop_items = [
@@ -189,6 +229,8 @@ shop_items = [
     Item("Ous", 3),
     Item("Caball", 12)
 ]
+items_texts: List[TextSprite] = []
+logs_text: TextSprite = None
 trade_menu: miniMenu.MenuSprite = None
 current_item: Item = None
 selection_menu: miniMenu.MenuSprite = None
@@ -481,13 +523,13 @@ nena = sprites.create(assets.image("""
     nena-front
     """), SpriteKind.player)
 trade_menu_open = 0
-info.set_score(logs)
 controller.move_sprite(nena)
 nena.set_stay_in_screen(True)
 nena.set_position(80, 95)
-house.set_position(17, 90)
+house.set_position(33, 90)
 tree.set_position(109, 90)
 tree2.set_position(125, 99)
 tree3.set_position(144, 90)
 tree.set_scale(0.8, ScaleAnchor.MIDDLE)
 tree3.set_scale(0.8, ScaleAnchor.MIDDLE)
+setup_items_display()

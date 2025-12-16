@@ -157,19 +157,19 @@ function on_trade_action(selection: any, index: any) {
         
     }
     
-    info.setScore(logs)
+    update_items_display()
     //  Close
     trade_menu.close()
     trade_menu_open = 0
 }
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function on_on_overlap(sprite: Sprite, otherSprite: Sprite) {
-    sprite.sayText("Vendre fusta", 100, false)
+    sprite.sayText("A per Vendre", 100, false)
 })
 //  -- CUT TREES --
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function on_on_overlap2(sprite2: Sprite, otherSprite2: Sprite) {
     
-    sprite2.sayText("Talar arbre", 100, false)
+    sprite2.sayText("A per Talar", 100, false)
     if (controller.A.isPressed()) {
         otherSprite2.startEffect(effects.ashes, 200)
         otherSprite2.setFlag(SpriteFlag.Invisible, true)
@@ -183,7 +183,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function on_on_overlap2(sp
         }
         
         logs += 1
-        info.setScore(logs)
+        update_items_display()
         timer.after(3000, function on_after() {
             otherSprite2.setFlag(SpriteFlag.Invisible, false)
             otherSprite2.setFlag(SpriteFlag.Ghost, false)
@@ -191,8 +191,55 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function on_on_overlap2(sp
     }
     
 })
+//  -- TEXTS --
+function setup_items_display() {
+    let quantity: number;
+    let name: string;
+    let text: TextSprite;
+    
+    let bg_color = 15
+    let fg_color = 1
+    let border_color = 1
+    let y_pos = 1
+    logs_text = textsprite.create("Fusta: " + ("" + logs), bg_color, fg_color)
+    logs_text.setBorder(1, border_color)
+    logs_text.setMaxFontHeight(8)
+    logs_text.left = 1
+    logs_text.top = y_pos
+    for (let item of shop_items) {
+        y_pos += 10
+        quantity = item.get_quantity()
+        name = item.get_name()
+        text = textsprite.create(name + ": " + ("" + quantity), bg_color, fg_color)
+        text.setBorder(1, border_color)
+        text.setMaxFontHeight(8)
+        text.left = 1
+        text.top = y_pos
+        items_texts.push(text)
+    }
+}
+
+function update_items_display() {
+    let current_item: Item;
+    let current_text: TextSprite;
+    let quantity: number;
+    let name: string;
+    logs_text.setText("Fusta: " + ("" + logs))
+    logs_text.left = 1
+    for (let i = 0; i < shop_items.length; i++) {
+        current_item = shop_items[i]
+        current_text = items_texts[i]
+        quantity = current_item.get_quantity()
+        name = current_item.get_name()
+        current_text.setText(name + ": " + ("" + quantity))
+        current_text.left = 1
+    }
+}
+
 //  -- START --
 let shop_items = [new Item("Gallina", 6), new Item("Patata", 2), new Item("Cabra", 5), new Item("Ous", 3), new Item("Caball", 12)]
+let items_texts : TextSprite[] = []
+let logs_text : TextSprite = null
 let trade_menu : miniMenu.MenuSprite = null
 let current_item : Item = null
 let selection_menu : miniMenu.MenuSprite = null
@@ -481,13 +528,13 @@ nena = sprites.create(assets.image`
     nena-front
     `, SpriteKind.Player)
 trade_menu_open = 0
-info.setScore(logs)
 controller.moveSprite(nena)
 nena.setStayInScreen(true)
 nena.setPosition(80, 95)
-house.setPosition(17, 90)
+house.setPosition(33, 90)
 tree.setPosition(109, 90)
 tree2.setPosition(125, 99)
 tree3.setPosition(144, 90)
 tree.setScale(0.8, ScaleAnchor.Middle)
 tree3.setScale(0.8, ScaleAnchor.Middle)
+setup_items_display()
