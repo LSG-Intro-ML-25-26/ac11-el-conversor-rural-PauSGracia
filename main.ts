@@ -2,139 +2,173 @@ namespace SpriteKind {
     export const House = SpriteKind.create()
     export const Tree = SpriteKind.create()
 }
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    nena,
-    assets.animation`nena-animation-up`,
-    200,
-    false
-    )
+
+//  class to manage shop items
+class Item {
+    private static _name: string
+    private ____name_is_set: boolean
+    private ____name: string
+    get _name(): string {
+        return this.____name_is_set ? this.____name : Item._name
+    }
+    set _name(value: string) {
+        this.____name_is_set = true
+        this.____name = value
+    }
+    
+    private static _price: number
+    private ____price_is_set: boolean
+    private ____price: number
+    get _price(): number {
+        return this.____price_is_set ? this.____price : Item._price
+    }
+    set _price(value: number) {
+        this.____price_is_set = true
+        this.____price = value
+    }
+    
+    private static _quantity: number
+    private ____quantity_is_set: boolean
+    private ____quantity: number
+    get _quantity(): number {
+        return this.____quantity_is_set ? this.____quantity : Item._quantity
+    }
+    set _quantity(value: number) {
+        this.____quantity_is_set = true
+        this.____quantity = value
+    }
+    
+    public static __initItem() {
+        Item._name = ""
+        Item._price = 0
+        Item._quantity = 0
+    }
+    
+    constructor(name: string, price: number) {
+        this._name = name
+        this._price = price
+        this._quantity = 0
+    }
+    
+    public get_name(): string {
+        return this._name
+    }
+    
+    public get_price(): number {
+        return this._price
+    }
+    
+    public get_quantity(): number {
+        return this._quantity
+    }
+    
+    public set_quantity(quantity: number) {
+        this._quantity = quantity
+    }
+    
+}
+
+Item.__initItem()
+
+//  -- ANIMATIONS --
+controller.up.onEvent(ControllerButtonEvent.Pressed, function on_up_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-up
+            `, 200, false)
 })
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+controller.left.onEvent(ControllerButtonEvent.Pressed, function on_left_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-left
+            `, 200, false)
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function on_right_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-right
+            `, 200, false)
+})
+controller.down.onEvent(ControllerButtonEvent.Pressed, function on_down_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-down
+            `, 200, false)
+})
+//  -- TRADING --
+controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
+    
     if (nena.overlapsWith(house) && trade_menu_open == 0) {
         trade_menu_open = 1
-        selection_menu = miniMenu.createMenu(
-        miniMenu.createMenuItem("Gallina"),
-        miniMenu.createMenuItem("Patata"),
-        miniMenu.createMenuItem("Cabra"),
-        miniMenu.createMenuItem("Ous"),
-        miniMenu.createMenuItem("Caball"),
-        miniMenu.createMenuItem("Tancar menú")
-        )
+        selection_menu = miniMenu.createMenu(miniMenu.createMenuItem("Gallina"), miniMenu.createMenuItem("Patata"), miniMenu.createMenuItem("Cabra"), miniMenu.createMenuItem("Ous"), miniMenu.createMenuItem("Caball"), miniMenu.createMenuItem("Tancar menú"))
         selection_menu.setTitle("Selecciona producte")
-        selection_menu.onSelectionChanged(function (selection, selectedIndex) {
-            if (selectedIndex == 0) {
-                current_item = selection
-                current_price = 6
-            } else if (selectedIndex == 1) {
-                current_item = selection
-                current_price = 2
-            } else if (selectedIndex == 2) {
-                current_item = selection
-                current_price = 5
-            } else if (selectedIndex == 3) {
-                current_item = selection
-                current_price = 3
-            } else if (selectedIndex == 4) {
-                current_item = selection
-                current_price = 12
-            } else {
-                current_item = selection
-                current_price = 0
-            }
-        })
-        selection_menu.onButtonPressed(controller.A, function (selection2, selectedIndex2) {
-            selection_menu.close()
-            trade_menu_open = 0
-            if (selectedIndex2 != 5) {
-                trade_menu = miniMenu.createMenu(
-                miniMenu.createMenuItem("Comprar"),
-                miniMenu.createMenuItem("Vendre"),
-                miniMenu.createMenuItem("Tornar Enrere")
-                )
-                trade_menu.setTitle(selection2)
-                trade_menu.onButtonPressed(controller.A, function (selection3, selectedIndex3) {
-                    if (selectedIndex3 == 0) {
-                        if (logs >= current_price) {
-                            logs = logs - current_price
-                            info.setScore(logs)
-                            if (current_item == "Gallina") {
-                                chicken = chicken + 1
-                                game.splash("Gallina Comprada")
-                            } else if (current_item == "Patata") {
-                                potato = potato + 1
-                                game.splash("Patates Comprades")
-                            } else if (current_item == "Cabra") {
-                                goat = goat + 1
-                                game.splash("Cabra comprada")
-                            } else if (current_item == "Ous") {
-                                egg = egg + 12
-                                game.splash("Ous comprats")
-                            } else if (current_item == "Caball") {
-                                egg = egg + 12
-                                game.splash("Caball comprat")
-                            }
-                        } else {
-                            game.splash("No tens suficient fusta")
-                        }
-                    } else if (selectedIndex3 == 1) {
-                        if (logs >= current_price) {
-                            logs = logs + current_price
-                            info.setScore(logs)
-                            if (current_item == "Gallina") {
-                                chicken = chicken - 1
-                                game.splash("Gallina Comprada")
-                            } else if (current_item == "Patata") {
-                                potato = potato + 1
-                                game.splash("Patates Comprades")
-                            } else if (current_item == "Cabra") {
-                                goat = goat + 1
-                                game.splash("Cabra comprada")
-                            } else if (current_item == "Ous") {
-                                egg = egg + 12
-                                game.splash("Ous comprats")
-                            } else if (current_item == "Caball") {
-                                egg = egg + 12
-                                game.splash("Caball comprat")
-                            }
-                        } else {
-                            game.splash("No tens suficient ", current_item)
-                        }
-                    }
-                    trade_menu.close()
-                })
-            }
+        selection_menu.onButtonPressed(controller.A, function on_button_pressed(selection: any, selectedIndex: number) {
+            on_item_selected(selection, selectedIndex)
+            
         })
     }
+    
 })
-controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    nena,
-    assets.animation`nena-animation-left`,
-    200,
-    false
-    )
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function (sprite, otherSprite) {
+//  handles item selection on menu
+function on_item_selected(selection: any, selectedIndex: number) {
+    
+    selection_menu.close()
+    //  close menu
+    if (selectedIndex == 5) {
+        trade_menu_open = 0
+        return
+    }
+    
+    current_item = shop_items[selectedIndex]
+    //  create sub-menu
+    trade_menu = miniMenu.createMenu(miniMenu.createMenuItem("Comprar"), miniMenu.createMenuItem("Vendre"), miniMenu.createMenuItem("Tornar Enrere"))
+    let title_text = current_item.get_name() + " (" + ("" + current_item.get_price()) + ")"
+    trade_menu.setTitle(title_text)
+    trade_menu.onButtonPressed(controller.A, function on_button_pressed(selection: any, selectedIndex: any) {
+        on_trade_action(selection, selectedIndex)
+        
+    })
+}
+
+//  trade logic
+function on_trade_action(selection: any, index: any) {
+    
+    let item_price = current_item.get_price()
+    let item_name = current_item.get_name()
+    let current_qty = current_item.get_quantity()
+    //  buy
+    if (index == 0) {
+        if (logs >= item_price) {
+            logs -= item_price
+            current_item.set_quantity(current_qty + 1)
+            game.splash(item_name + " comprat!")
+        } else {
+            game.splash("Falta fusta!")
+        }
+        
+    } else if (index == 1) {
+        //  sell        
+        if (current_qty > 0) {
+            logs += item_price
+            current_item.set_quantity(current_qty - 1)
+            game.splash(item_name + " venut!")
+        } else {
+            game.splash("No tens " + item_name)
+        }
+        
+    } else if (index == 2) {
+        //  close trade menu        
+        
+    }
+    
+    info.setScore(logs)
+    //  Close
+    trade_menu.close()
+    trade_menu_open = 0
+}
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.House, function on_on_overlap(sprite: Sprite, otherSprite: Sprite) {
     sprite.sayText("Vendre fusta", 100, false)
 })
-controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    nena,
-    assets.animation`nena-animation-right`,
-    200,
-    false
-    )
-})
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    nena,
-    assets.animation`nena-animation-down`,
-    200,
-    false
-    )
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite2, otherSprite2) {
+//  -- CUT TREES --
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function on_on_overlap2(sprite2: Sprite, otherSprite2: Sprite) {
+    
     sprite2.sayText("Talar arbre", 100, false)
     if (controller.A.isPressed()) {
         otherSprite2.startEffect(effects.ashes, 200)
@@ -147,28 +181,27 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Tree, function (sprite2, otherSp
         } else {
             otherSprite2.setPosition(randint(130, 145), randint(100, 110))
         }
+        
         logs += 1
         info.setScore(logs)
-        timer.after(3000, function () {
+        timer.after(3000, function on_after() {
             otherSprite2.setFlag(SpriteFlag.Invisible, false)
             otherSprite2.setFlag(SpriteFlag.Ghost, false)
         })
     }
+    
 })
-let egg = 0
-let goat = 0
-let potato = 0
-let chicken = 0
-let trade_menu: miniMenu.MenuSprite = null
-let current_price = 0
-let current_item = ""
-let selection_menu: miniMenu.MenuSprite = null
+//  -- START --
+let shop_items = [new Item("Gallina", 6), new Item("Patata", 2), new Item("Cabra", 5), new Item("Ous", 3), new Item("Caball", 12)]
+let trade_menu : miniMenu.MenuSprite = null
+let current_item : Item = null
+let selection_menu : miniMenu.MenuSprite = null
 let logs = 0
 let trade_menu_open = 0
-let nena: Sprite = null
-let tree2: Sprite = null
-let tree: Sprite = null
-let house: Sprite = null
+let nena : Sprite = null
+let tree2 : Sprite = null
+let tree : Sprite = null
+let house : Sprite = null
 scene.setBackgroundImage(img`
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     7777777777777777777777777777777777777777777777777777777777777777777777777377777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -292,159 +325,161 @@ scene.setBackgroundImage(img`
     7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
     `)
 house = sprites.create(img`
-    ....................e2e22e2e....................
-    .................222eee22e2e222.................
-    ..............222e22e2e22eee22e222..............
-    ...........e22e22eeee2e22e2eeee22e22e...........
-    ........eeee22e22e22e2e22e2e22e22e22eeee........
-    .....222e22e22eeee22e2e22e2e22eeee22e22e222.....
-    ...22eeee22e22e22e22eee22eee22e22e22e22eeee22...
-    4cc22e22e22eeee22e22e2e22e2e22e22eeee22e22e22cc4
-    6c6eee22e22e22e22e22e2e22e2e22e22e22e22e22eee6c6
-    46622e22eeee22e22eeee2e22e2eeee22e22eeee22e22664
-    46622e22e22e22eeee22e2e22e2e22eeee22e22e22e22664
-    4cc22eeee22e22e22e22eee22eee22e22e22e22eeee22cc4
-    6c622e22e22eeee22e22e2e22e2e22e22eeee22e22e226c6
-    466eee22e22e22e22e22e2e22e2e22e22e22e22e22eee664
-    46622e22eeee22e22e22e2e22e2e22e22e22eeee22e22664
-    4cc22e22e22e22e22eeee2e22e2eeee22e22e22e22e22cc4
-    6c622eeee22e22eeee22eee22eee22eeee22e22eeee226c6
-    46622e22e22eeee22e22e2e22e2e22e22eeee22e22e22664
-    466eee22e22e22e22e22e2e22e2e22e22e22e22e22eee664
-    4cc22e22eeee22e22e22e2e22e2e22e22e22eeee22e22cc4
-    6c622e22e22e22e22e22eee22eee22e22e22e22e22e226c6
-    46622eeee22e22e22eeecc6666cceee22e22e22eeee22664
-    46622e22e22e22eeecc6666666666cceee22e22e22e22664
-    4cceee22e22eeecc66666cccccc66666cceee22e22eeecc4
-    6c622e22eeecc66666cc64444446cc66666cceee22e226c6
-    46622e22cc66666cc64444444444446cc66666cc22e22664
-    46622cc6666ccc64444444444444444446ccc6666cc22664
-    4ccc6666ccc6444bcc666666666666ccb4446ccc6666ccc4
-    cccccccc6666666cb44444444444444bc6666666cccccccc
-    64444444444446c444444444444444444c64444444444446
-    66cb444444444cb411111111111111114bc444444444bc66
-    666cccccccccccd166666666666666661dccccccccccc666
-    6666444444444c116eeeeeeeeeeeeee611c4444444446666
-    666e2222222e4c16e4e44e44e44e44ee61c4e2222222e666
-    666eeeeeeeee4c16e4e44e44e44e44ee61c4eeeeeeeee666
-    666eddddddde4c66f4e4effffffe44ee66c4eddddddde666
-    666edffdffde4c66f4effffffffff4ee66c4edffdffde666
-    666edccdccde4c66f4effffffffffeee66c4edccdccde666
-    666eddddddde4c66f4eeeeeeeeeeeeee66c4eddddddde666
-    c66edffdffde4c66e4e44e44e44e44ee66c4edffdffde66c
-    c66edccdccde4c66e4e44e44e44e44ee66c4edccdccde66c
-    cc66666666664c66e4e44e44e44feeee66c46666666666cc
-    .c66444444444c66e4e44e44e44ffffe66c44444444466c.
-    ..c64eee4eee4c66f4e44e44e44f44fe66c4eee4eee46c..
-    ...c4eee4eee4c66f4e44e44e44effee66c4eee4eee4c...
-    ....644444444c66f4e44e44e44e44ee66c444444446....
-    .....64eee444c66f4e44e44e44e44ee66c444eee46.....
-    ......6ccc666c66e4e44e44e44e44ee66c666ccc6......
-    `, SpriteKind.House)
+        ....................e2e22e2e....................
+        .................222eee22e2e222.................
+        ..............222e22e2e22eee22e222..............
+        ...........e22e22eeee2e22e2eeee22e22e...........
+        ........eeee22e22e22e2e22e2e22e22e22eeee........
+        .....222e22e22eeee22e2e22e2e22eeee22e22e222.....
+        ...22eeee22e22e22e22eee22eee22e22e22e22eeee22...
+        4cc22e22e22eeee22e22e2e22e2e22e22eeee22e22e22cc4
+        6c6eee22e22e22e22e22e2e22e2e22e22e22e22e22eee6c6
+        46622e22eeee22e22eeee2e22e2eeee22e22eeee22e22664
+        46622e22e22e22eeee22e2e22e2e22eeee22e22e22e22664
+        4cc22eeee22e22e22e22eee22eee22e22e22e22eeee22cc4
+        6c622e22e22eeee22e22e2e22e2e22e22eeee22e22e226c6
+        466eee22e22e22e22e22e2e22e2e22e22e22e22e22eee664
+        46622e22eeee22e22e22e2e22e2e22e22e22eeee22e22664
+        4cc22e22e22e22e22eeee2e22e2eeee22e22e22e22e22cc4
+        6c622eeee22e22eeee22eee22eee22eeee22e22eeee226c6
+        46622e22e22eeee22e22e2e22e2e22e22eeee22e22e22664
+        466eee22e22e22e22e22e2e22e2e22e22e22e22e22eee664
+        4cc22e22eeee22e22e22e2e22e2e22e22e22eeee22e22cc4
+        6c622e22e22e22e22e22eee22eee22e22e22e22e22e226c6
+        46622eeee22e22e22eeecc6666cceee22e22e22eeee22664
+        46622e22e22e22eeecc6666666666cceee22e22e22e22664
+        4cceee22e22eeecc66666cccccc66666cceee22e22eeecc4
+        6c622e22eeecc66666cc64444446cc66666cceee22e226c6
+        46622e22cc66666cc64444444444446cc66666cc22e22664
+        46622cc6666ccc64444444444444444446ccc6666cc22664
+        4ccc6666ccc6444bcc666666666666ccb4446ccc6666ccc4
+        cccccccc6666666cb44444444444444bc6666666cccccccc
+        64444444444446c444444444444444444c64444444444446
+        66cb444444444cb411111111111111114bc444444444bc66
+        666cccccccccccd166666666666666661dccccccccccc666
+        6666444444444c116eeeeeeeeeeeeee611c4444444446666
+        666e2222222e4c16e4e44e44e44e44ee61c4e2222222e666
+        666eeeeeeeee4c16e4e44e44e44e44ee61c4eeeeeeeee666
+        666eddddddde4c66f4e4effffffe44ee66c4eddddddde666
+        666edffdffde4c66f4effffffffff4ee66c4edffdffde666
+        666edccdccde4c66f4effffffffffeee66c4edccdccde666
+        666eddddddde4c66f4eeeeeeeeeeeeee66c4eddddddde666
+        c66edffdffde4c66e4e44e44e44e44ee66c4edffdffde66c
+        c66edccdccde4c66e4e44e44e44e44ee66c4edccdccde66c
+        cc66666666664c66e4e44e44e44feeee66c46666666666cc
+        .c66444444444c66e4e44e44e44ffffe66c44444444466c.
+        ..c64eee4eee4c66f4e44e44e44f44fe66c4eee4eee46c..
+        ...c4eee4eee4c66f4e44e44e44effee66c4eee4eee4c...
+        ....644444444c66f4e44e44e44e44ee66c444444446....
+        .....64eee444c66f4e44e44e44e44ee66c444eee46.....
+        ......6ccc666c66e4e44e44e44e44ee66c666ccc6......
+        `, SpriteKind.House)
 tree = sprites.create(img`
-    ...............cc...............
-    ............ccc65c66............
-    ............c6c55c76............
-    ...........6cc7557c66...........
-    ..........cc77777577c6..........
-    .........666c677776cc66.........
-    ........c7776c7c67657576........
-    ........ccc666c666655666........
-    ......c66cc7666667777c6766......
-    .....c777c77667667767767776.....
-    .....cc66cccc77c677cc666666.....
-    ....c6766666c7c6767677777766....
-    ...cc777666666677767777667c66...
-    .666cc6677666667777777776677666.
-    .67776677c676677777776677677776.
-    cc6666ccc67767776777776cc7767666
-    c666777667766776c776777c67776c66
-    .c6777666ccc667c676cc666667776c.
-    .cc6666766666cc66666666776cc666.
-    ...66776c666666666677667766cccc.
-    ...cc76c66766666667677667776c...
-    ...6cccc677666666776777c77666...
-    ......6ccc7c67767776c776cc......
-    ........ccc6777c67776cc6........
-    ...........cc77c67766...........
-    .............6c6666.............
-    ............ffeeeef.............
-    ..........ffeeeeeeeef...........
-    .............feeeffe............
-    ..............fef...............
-    ..............fef...............
-    ...............f................
-    `, SpriteKind.Tree)
+        ...............cc...............
+        ............ccc65c66............
+        ............c6c55c76............
+        ...........6cc7557c66...........
+        ..........cc77777577c6..........
+        .........666c677776cc66.........
+        ........c7776c7c67657576........
+        ........ccc666c666655666........
+        ......c66cc7666667777c6766......
+        .....c777c77667667767767776.....
+        .....cc66cccc77c677cc666666.....
+        ....c6766666c7c6767677777766....
+        ...cc777666666677767777667c66...
+        .666cc6677666667777777776677666.
+        .67776677c676677777776677677776.
+        cc6666ccc67767776777776cc7767666
+        c666777667766776c776777c67776c66
+        .c6777666ccc667c676cc666667776c.
+        .cc6666766666cc66666666776cc666.
+        ...66776c666666666677667766cccc.
+        ...cc76c66766666667677667776c...
+        ...6cccc677666666776777c77666...
+        ......6ccc7c67767776c776cc......
+        ........ccc6777c67776cc6........
+        ...........cc77c67766...........
+        .............6c6666.............
+        ............ffeeeef.............
+        ..........ffeeeeeeeef...........
+        .............feeeffe............
+        ..............fef...............
+        ..............fef...............
+        ...............f................
+        `, SpriteKind.Tree)
 let tree3 = sprites.create(img`
-    ................86..................
-    ...........6688867886...............
-    ...........8666877688868............
-    ............868777767768............
-    .........688667777776688............
-    ........67767777777778666...........
-    .........6776667767666868...........
-    ..........866667667677688...........
-    .........8666666666667778...........
-    ........667766666666666676..........
-    .......67766667666776667776.........
-    ......886667776676777666688.........
-    .....67766777667767777666768........
-    ....6776666666777667776666776.......
-    .....8667776667766676677776776......
-    ......8777666666667776777776688.....
-    ....6887766776677677777777776776....
-    ..8866666677767777777777766666778...
-    .86666666777667767777766666776668...
-    ..88677666666777677677666667776668..
-    ..86776677666666666666667776666668..
-    886666677766667666666776677766668...
-    6668666676667766767767766677666668..
-    88866666666777677677667666666776668.
-    .86668866666766776776666667766666668
-    .86688666666666776666667667776666688
-    .668866666666666666666677666666688..
-    ..8866686666666666677667776666668...
-    ...866886666666666677667776666668...
-    ...86886668666666667666666666888....
-    ....88866886686666666666666668......
-    ......86886668666866668666868.......
-    ......88866688668866688866888.......
-    ........8888888688888ce868..........
-    ..............e88e88.ec.8...........
-    ...............eeee..e..............
-    ...............ceef.ce..............
-    ...............ceefcec..............
-    ...............feefce...............
-    ...............fceeec...............
-    ...............ffceec...............
-    `, SpriteKind.Tree)
+        ................86..................
+        ...........6688867886...............
+        ...........8666877688868............
+        ............868777767768............
+        .........688667777776688............
+        ........67767777777778666...........
+        .........6776667767666868...........
+        ..........866667667677688...........
+        .........8666666666667778...........
+        ........667766666666666676..........
+        .......67766667666776667776.........
+        ......886667776676777666688.........
+        .....67766777667767777666768........
+        ....6776666666777667776666776.......
+        .....8667776667766676677776776......
+        ......8777666666667776777776688.....
+        ....6887766776677677777777776776....
+        ..8866666677767777777777766666778...
+        .86666666777667767777766666776668...
+        ..88677666666777677677666667776668..
+        ..86776677666666666666667776666668..
+        886666677766667666666776677766668...
+        6668666676667766767767766677666668..
+        88866666666777677677667666666776668.
+        .86668866666766776776666667766666668
+        .86688666666666776666667667776666688
+        .668866666666666666666677666666688..
+        ..8866686666666666677667776666668...
+        ...866886666666666677667776666668...
+        ...86886668666666667666666666888....
+        ....88866886686666666666666668......
+        ......86886668666866668666868.......
+        ......88866688668866688866888.......
+        ........8888888688888ce868..........
+        ..............e88e88.ec.8...........
+        ...............eeee..e..............
+        ...............ceef.ce..............
+        ...............ceefcec..............
+        ...............feefce...............
+        ...............fceeec...............
+        ...............ffceec...............
+        `, SpriteKind.Tree)
 tree2 = sprites.create(img`
-    ......cc66......
-    .....c6576c.....
-    ....c677576c....
-    ....cc677666....
-    ...cc6c6667cc...
-    ..6c666777cc6c..
-    ..c76666766776..
-    ..c6777777776c..
-    ..cc67777776cc..
-    .c67cc76676676c.
-    .c777666667777c.
-    .c6777777777766.
-    .cc7767776776666
-    c676cc6766666776
-    c777766666677776
-    cc7777777777776c
-    .c676777677767c.
-    ..cc667666766c..
-    ...ccc6c66ccc...
-    .....cccccc.....
-    .......ee.......
-    ......eeee......
-    .....eeeeee.....
-    .......ee.......
-    `, SpriteKind.Tree)
-nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
+        ......cc66......
+        .....c6576c.....
+        ....c677576c....
+        ....cc677666....
+        ...cc6c6667cc...
+        ..6c666777cc6c..
+        ..c76666766776..
+        ..c6777777776c..
+        ..cc67777776cc..
+        .c67cc76676676c.
+        .c777666667777c.
+        .c6777777777766.
+        .cc7767776776666
+        c676cc6766666776
+        c777766666677776
+        cc7777777777776c
+        .c676777677767c.
+        ..cc667666766c..
+        ...ccc6c66ccc...
+        .....cccccc.....
+        .......ee.......
+        ......eeee......
+        .....eeeeee.....
+        .......ee.......
+        `, SpriteKind.Tree)
+nena = sprites.create(assets.image`
+    nena-front
+    `, SpriteKind.Player)
 trade_menu_open = 0
 info.setScore(logs)
 controller.moveSprite(nena)

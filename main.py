@@ -3,6 +3,31 @@ class SpriteKind:
     House = SpriteKind.create()
     Tree = SpriteKind.create()
 
+# class to manage shop items
+class Item:
+    _name = ""
+    _price = 0
+    _quantity = 0
+
+    def __init__(self, name, price):
+        self._name = name
+        self._price = price
+        self._quantity = 0
+
+    def get_name(self):
+        return self._name
+
+    def get_price(self):
+        return self._price
+        
+    def get_quantity(self):
+        return self._quantity
+    
+    def set_quantity(self, quantity):
+        self._quantity = quantity
+
+
+# -- ANIMATIONS --
 def on_up_pressed():
     animation.run_image_animation(nena,
         assets.animation("""
@@ -12,70 +37,6 @@ def on_up_pressed():
         False)
 controller.up.on_event(ControllerButtonEvent.PRESSED, on_up_pressed)
 
-def on_a_pressed():
-    global trade_menu_open, selection_menu
-    if nena.overlaps_with(house) and trade_menu_open == 0:
-        trade_menu_open = 1
-        selection_menu = miniMenu.create_menu(miniMenu.create_menu_item("Gallina"),
-            miniMenu.create_menu_item("Patata"),
-            miniMenu.create_menu_item("Cabra"),
-            miniMenu.create_menu_item("Ous"),
-            miniMenu.create_menu_item("Caball"),
-            miniMenu.create_menu_item("Tancar menú"))
-        selection_menu.set_title("Selecciona producte")
-        
-        def on_selection_changed(selection, selectedIndex):
-            global current_item, current_price
-            if selectedIndex == 0:
-                current_item = selection
-                current_price = 6
-            elif selectedIndex == 1:
-                current_item = selection
-                current_price = 2
-            elif selectedIndex == 2:
-                current_item = selection
-                current_price = 5
-            elif selectedIndex == 3:
-                current_item = selection
-                current_price = 3
-            elif selectedIndex == 4:
-                current_item = selection
-                current_price = 12
-            else:
-                current_item = selection
-                current_price = 0
-        selection_menu.on_selection_changed(on_selection_changed)
-        
-        
-        def on_button_pressed(selection2, selectedIndex2):
-            global trade_menu_open, trade_menu
-            selection_menu.close()
-            trade_menu_open = 0
-            if selectedIndex2 != 5:
-                trade_menu = miniMenu.create_menu(miniMenu.create_menu_item("Comprar"),
-                    miniMenu.create_menu_item("Vendre"),
-                    miniMenu.create_menu_item("Tornar Enrere"))
-                trade_menu.set_title(selection2)
-                
-                def on_button_pressed2(selection3, selectedIndex3):
-                    global logs
-                    if selectedIndex3 == 0:
-                        if logs >= current_price:
-                            logs = logs - current_price
-                            if current_item == "Gallina":
-                                pass
-                        else:
-                            game.splash("No tens suficient fusta")
-                        game.splash("Gallina Comprada")
-                    elif selectedIndex3 == 1:
-                        pass
-                    trade_menu.close()
-                trade_menu.on_button_pressed(controller.A, on_button_pressed2)
-                
-        selection_menu.on_button_pressed(controller.A, on_button_pressed)
-        
-controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
-
 def on_left_pressed():
     animation.run_image_animation(nena,
         assets.animation("""
@@ -84,10 +45,6 @@ def on_left_pressed():
         200,
         False)
 controller.left.on_event(ControllerButtonEvent.PRESSED, on_left_pressed)
-
-def on_on_overlap(sprite, otherSprite):
-    sprite.say_text("Vendre fusta", 100, False)
-sprites.on_overlap(SpriteKind.player, SpriteKind.House, on_on_overlap)
 
 def on_right_pressed():
     animation.run_image_animation(nena,
@@ -107,6 +64,100 @@ def on_down_pressed():
         False)
 controller.down.on_event(ControllerButtonEvent.PRESSED, on_down_pressed)
 
+# -- TRADING --
+def on_a_pressed():
+    global trade_menu_open, selection_menu
+    
+    if nena.overlaps_with(house) and trade_menu_open == 0:
+        trade_menu_open = 1
+        
+        selection_menu = miniMenu.create_menu(
+            miniMenu.create_menu_item("Gallina"),
+            miniMenu.create_menu_item("Patata"),
+            miniMenu.create_menu_item("Cabra"),
+            miniMenu.create_menu_item("Ous"),
+            miniMenu.create_menu_item("Caball"),
+            miniMenu.create_menu_item("Tancar menú")
+        )
+        selection_menu.set_title("Selecciona producte")
+        def on_button_pressed(selection, selectedIndex):
+            on_item_selected(selection, selectedIndex)
+            pass
+        selection_menu.on_button_pressed(controller.A, on_button_pressed)
+
+controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
+
+# handles item selection on menu
+def on_item_selected(selection, selectedIndex):
+    global current_item, trade_menu, trade_menu_open
+    
+    selection_menu.close()
+    
+    # close menu
+    if selectedIndex == 5:
+        trade_menu_open = 0
+        return
+
+    current_item = shop_items[selectedIndex]
+    
+    # create sub-menu
+    trade_menu = miniMenu.create_menu(
+        miniMenu.create_menu_item("Comprar"),
+        miniMenu.create_menu_item("Vendre"),
+        miniMenu.create_menu_item("Tornar Enrere")
+    )
+    
+    title_text = current_item.get_name() + " (" + str(current_item.get_price()) + ")"
+    trade_menu.set_title(title_text)
+    
+    def on_button_pressed(selection, selectedIndex):
+        on_trade_action(selection, selectedIndex)
+        pass
+    trade_menu.on_button_pressed(controller.A, on_button_pressed)
+
+# trade logic
+def on_trade_action(selection, index):
+    global logs, trade_menu_open
+    
+    item_price = current_item.get_price()
+    item_name = current_item.get_name()
+    current_qty = current_item.get_quantity()
+    
+    # buy
+    if index == 0:
+        if logs >= item_price:
+            logs -= item_price
+            
+            current_item.set_quantity(current_qty + 1)
+            
+            game.splash(item_name + " comprat!")
+        else:
+            game.splash("Falta fusta!")
+    # sell        
+    elif index == 1:
+        if current_qty > 0:
+            logs += item_price
+            
+            current_item.set_quantity(current_qty - 1)
+            
+            game.splash(item_name + " venut!")
+        else:
+            game.splash("No tens " + item_name)
+    # close trade menu        
+    elif index == 2: 
+        pass
+
+    info.set_score(logs)
+    
+    # Close
+    trade_menu.close()
+    trade_menu_open = 0
+
+def on_on_overlap(sprite, otherSprite):
+    sprite.say_text("Vendre fusta", 100, False)
+sprites.on_overlap(SpriteKind.player, SpriteKind.House, on_on_overlap)
+
+# -- CUT TREES --
 def on_on_overlap2(sprite2, otherSprite2):
     global logs
     sprite2.say_text("Talar arbre", 100, False)
@@ -130,9 +181,16 @@ def on_on_overlap2(sprite2, otherSprite2):
         
 sprites.on_overlap(SpriteKind.player, SpriteKind.Tree, on_on_overlap2)
 
+# -- START --
+shop_items = [
+    Item("Gallina", 6),
+    Item("Patata", 2),
+    Item("Cabra", 5),
+    Item("Ous", 3),
+    Item("Caball", 12)
+]
 trade_menu: miniMenu.MenuSprite = None
-current_price = 0
-current_item = ""
+current_item: Item = None
 selection_menu: miniMenu.MenuSprite = None
 logs = 0
 trade_menu_open = 0
