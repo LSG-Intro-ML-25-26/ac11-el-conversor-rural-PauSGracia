@@ -92,21 +92,27 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function on_down_pressed(
             `, 200, false)
 })
 //  -- TRADING --
-controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
+function on_a_pressed() {
     
     if (nena.overlapsWith(house) && trade_menu_open == 0) {
         trade_menu_open = 1
         //  stop player movement
         controller.moveSprite(nena, 0, 0)
         selection_menu = miniMenu.createMenu(miniMenu.createMenuItem("Gallina"), miniMenu.createMenuItem("Patata"), miniMenu.createMenuItem("Cabra"), miniMenu.createMenuItem("Ous"), miniMenu.createMenuItem("Caball"), miniMenu.createMenuItem("Tancar menú"))
-        selection_menu.setTitle("Selecciona producte")
+        selection_menu.setTitle("TENDA")
+        //  move menu to the right and show all options
+        selection_menu.setDimensions(85, 105)
+        selection_menu.right = 158
+        selection_menu.y = 60
         selection_menu.onButtonPressed(controller.A, function on_button_pressed(selection: any, selectedIndex: number) {
             on_item_selected(selection, selectedIndex)
             
         })
     }
     
-})
+}
+
+controller.A.onEvent(ControllerButtonEvent.Pressed, on_a_pressed)
 //  handles item selection on menu
 function on_item_selected(selection: any, selectedIndex: number) {
     
@@ -122,7 +128,11 @@ function on_item_selected(selection: any, selectedIndex: number) {
     current_item = shop_items[selectedIndex]
     //  create sub-menu
     trade_menu = miniMenu.createMenu(miniMenu.createMenuItem("Comprar"), miniMenu.createMenuItem("Vendre"), miniMenu.createMenuItem("Tornar Enrere"))
-    let title_text = current_item.get_name() + " (" + ("" + current_item.get_price()) + ")"
+    //  move menu to the right and show all options
+    trade_menu.setDimensions(85, 60)
+    trade_menu.right = 158
+    trade_menu.y = 60
+    let title_text = current_item.get_name().toUpperCase() + " (" + ("" + current_item.get_price()) + ")"
     trade_menu.setTitle(title_text)
     trade_menu.onButtonPressed(controller.A, function on_button_pressed(selection: any, selectedIndex: any) {
         on_trade_action(selection, selectedIndex)
@@ -158,7 +168,10 @@ function on_trade_action(selection: any, index: any) {
         
     } else if (index == 2) {
         //  close trade menu        
-        
+        trade_menu.close()
+        trade_menu_open = 0
+        on_a_pressed()
+        return
     }
     
     update_items_display()

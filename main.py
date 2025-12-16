@@ -81,7 +81,12 @@ def on_a_pressed():
             miniMenu.create_menu_item("Caball"),
             miniMenu.create_menu_item("Tancar menú")
         )
-        selection_menu.set_title("Selecciona producte")
+        selection_menu.set_title("TENDA")
+        # move menu to the right and show all options
+        selection_menu.set_dimensions(85, 105)
+        selection_menu.right = 158
+        selection_menu.y = 60
+        
         def on_button_pressed(selection, selectedIndex):
             on_item_selected(selection, selectedIndex)
             pass
@@ -110,8 +115,12 @@ def on_item_selected(selection, selectedIndex):
         miniMenu.create_menu_item("Vendre"),
         miniMenu.create_menu_item("Tornar Enrere")
     )
+    # move menu to the right and show all options
+    trade_menu.set_dimensions(85, 60) 
+    trade_menu.right = 158        
+    trade_menu.y = 60
     
-    title_text = current_item.get_name() + " (" + str(current_item.get_price()) + ")"
+    title_text = current_item.get_name().toUpperCase() + " (" + str(current_item.get_price()) + ")"
     trade_menu.set_title(title_text)
     
     def on_button_pressed(selection, selectedIndex):
@@ -149,7 +158,10 @@ def on_trade_action(selection, index):
             game.splash("No tens " + item_name)
     # close trade menu        
     elif index == 2: 
-        pass
+        trade_menu.close()
+        trade_menu_open = 0
+        on_a_pressed()
+        return
 
     update_items_display()
     # Close
