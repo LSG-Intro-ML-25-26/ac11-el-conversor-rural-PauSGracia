@@ -175,7 +175,7 @@ function on_trade_action(selection: any, index: any) {
     }
     
     update_items_display()
-    //  Close
+    //  Close main menu
     trade_menu.close()
     trade_menu_open = 0
     //  restore player movement
