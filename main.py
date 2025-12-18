@@ -1,3 +1,8 @@
+# Made by Pau Solé
+# Si vas al codi de blocks, es trenca el makecode arcade
+# per arreglaro, ves al github, copia el codi en el main.py
+# i enganxa el codi aquí
+
 @namespace
 class SpriteKind:
     House = SpriteKind.create()
@@ -116,8 +121,8 @@ def on_item_selected(selection, selectedIndex):
         miniMenu.create_menu_item("Tornar Enrere")
     )
     # move menu to the right and show all options
-    trade_menu.set_dimensions(85, 60) 
-    trade_menu.right = 158        
+    trade_menu.set_dimensions(85, 60)
+    trade_menu.right = 158
     trade_menu.y = 60
     
     title_text = current_item.get_name().toUpperCase() + " (" + str(current_item.get_price()) + ")"
@@ -146,7 +151,7 @@ def on_trade_action(selection, index):
             game.splash(item_name + " comprat!")
         else:
             game.splash("Falta fusta!")
-    # sell        
+    # sell
     elif index == 1:
         if current_qty > 0:
             logs += item_price
@@ -156,8 +161,8 @@ def on_trade_action(selection, index):
             game.splash(item_name + " venut!")
         else:
             game.splash("No tens " + item_name)
-    # close trade menu        
-    elif index == 2: 
+    # close trade menu
+    elif index == 2:
         trade_menu.close()
         trade_menu_open = 0
         on_a_pressed()
