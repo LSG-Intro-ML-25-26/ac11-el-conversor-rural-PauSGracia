@@ -1,5 +1,6 @@
 {
     "name": "PauSole_Conversor_Rural",
+    "version": "1.0.0",
     "description": "",
     "dependencies": {
         "device": "*",
