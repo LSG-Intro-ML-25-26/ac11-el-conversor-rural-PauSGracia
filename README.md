@@ -1,3 +1,8 @@
+# IMPORTANT
+- Si el joc no es veu com a les captures de pantalla, he fet un nou repositori on sí s'hauria de veure com les captures de pantalla
+- Repositori github: https://github.com/PauSGracia/pausoleconversiorural
+- Link joc: https://pausgracia.github.io/pausoleconversiorural/
+
 # CONVERSOR RURAL
 - Aquest joc petit permet tal·lar arbres amb el botó A i comprar/vendre varis objectes
 - Per intercanviar objectes, ves a la casa i prem A
